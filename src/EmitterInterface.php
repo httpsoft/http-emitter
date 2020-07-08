@@ -15,6 +15,7 @@ interface EmitterInterface
      * exceptions if cannot emit a response, e.g., if headers already sent or output has been emitted previously.
      *
      * @param ResponseInterface $response
+     * @param bool $withoutBody
      */
-    public function emit(ResponseInterface $response): void;
+    public function emit(ResponseInterface $response, bool $withoutBody = false): void;
 }

@@ -140,6 +140,32 @@ class SapiEmitterTest extends TestCase
         $this->expectOutputString('Cont');
     }
 
+    public function testEmitWithoutBodyTrue(): void
+    {
+        $emitter = new SapiEmitter();
+        $response = $this->createResponse($code = 404, ['X-Test' => 'test'], 'Page not found', '2');
+        $emitter->emit($response, true);
+
+        $this->assertSame($code, http_response_code());
+        $this->assertCount(1, headers_list());
+        $this->assertSame(['X-Test: test'], headers_list());
+        $this->assertSame('HTTP/2 404 Not Found', http_response_status_line());
+        $this->expectOutputString('');
+    }
+
+    public function testEmitWithoutBodyTrueAndWithBufferLengthAndContentRangeHeader(): void
+    {
+        $emitter = new SapiEmitter(1);
+        $response = $this->createResponse($code = 200, ['Content-Range' => 'bytes 0-3/8'], 'Contents');
+        $emitter->emit($response, true);
+
+        $this->assertSame($code, http_response_code());
+        $this->assertCount(1, headers_list());
+        $this->assertSame(['Content-Range: bytes 0-3/8'], headers_list());
+        $this->assertSame('HTTP/1.1 200 OK', http_response_status_line());
+        $this->expectOutputString('');
+    }
+
     public function testEmitBodyWithNotReadableStream(): void
     {
         $response = new Response(200, '', fopen('data://,', 'wb'));

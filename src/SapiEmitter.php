@@ -44,7 +44,7 @@ final class SapiEmitter implements EmitterInterface
      *
      * @throws RuntimeException if headers already sent or output has been emitted previously.
      */
-    public function emit(ResponseInterface $response): void
+    public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
         if (headers_sent() || (ob_get_level() > 0 && ob_get_length() > 0)) {
             throw new RuntimeException(
@@ -54,7 +54,10 @@ final class SapiEmitter implements EmitterInterface
 
         $this->emitHeaders($response);
         $this->emitStatusLine($response);
-        $this->emitBody($response);
+
+        if (!$withoutBody && $response->getBody()->isReadable()) {
+            $this->emitBody($response);
+        }
     }
 
     /**
@@ -97,19 +100,13 @@ final class SapiEmitter implements EmitterInterface
      */
     private function emitBody(ResponseInterface $response): void
     {
-        $body = $response->getBody();
-
-        if (!$body->isReadable()) {
-            echo '';
-            return;
-        }
-
         if ($this->bufferLength === null) {
             echo $response->getBody();
             return;
         }
 
         flush();
+        $body = $response->getBody();
         $range = $this->parseContentRange($response->getHeaderLine('content-range'));
 
         if (isset($range['unit']) && $range['unit'] === 'bytes') {

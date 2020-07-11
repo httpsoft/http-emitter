@@ -45,8 +45,12 @@ final class SapiEmitter implements EmitterInterface
      */
     public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
-        if (headers_sent() || (ob_get_level() > 0 && ob_get_length() > 0)) {
-            throw EmitterException::forHeadersOrOutputSent();
+        if (headers_sent()) {
+            throw EmitterException::forHeadersSent();
+        }
+
+        if (ob_get_level() > 0 && ob_get_length() > 0) {
+            throw EmitterException::forOutputSent();
         }
 
         $this->emitHeaders($response);

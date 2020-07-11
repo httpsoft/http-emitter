@@ -22,8 +22,16 @@ class EmitterException extends RuntimeException
     /**
      * @return static
      */
-    public static function forHeadersOrOutputSent(): self
+    public static function forHeadersSent(): self
     {
-        return new self('Unable to emit response. Headers already sent or output has been emitted previously.');
+        return new self('Unable to emit response; headers already sent.');
+    }
+
+    /**
+     * @return static
+     */
+    public static function forOutputSent(): self
+    {
+        return new self('Unable to emit response; output has been emitted previously.');
     }
 }

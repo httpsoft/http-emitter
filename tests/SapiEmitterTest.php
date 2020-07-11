@@ -6,8 +6,8 @@ namespace HttpSoft\Tests\Runner;
 
 use HttpSoft\Response\Response;
 use HttpSoft\Runner\EmitterInterface;
+use HttpSoft\Runner\Exception\EmitterException;
 use HttpSoft\Runner\SapiEmitter;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -97,7 +97,7 @@ class SapiEmitterTest extends TestCase
 
     public function testConstructorThrowExceptionForBufferLengthIsIntegerTypeAndLessThanOne(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(EmitterException::class);
         new SapiEmitter(0);
     }
 

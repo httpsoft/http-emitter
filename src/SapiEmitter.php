@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace HttpSoft\Runner;
 
-use InvalidArgumentException;
+use HttpSoft\Runner\Exception\EmitterException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use RuntimeException;
 
 use function flush;
 use function ob_get_length;
@@ -28,12 +27,12 @@ final class SapiEmitter implements EmitterInterface
 
     /**
      * @param int|null $bufferLength
-     * @throws InvalidArgumentException if buffer length is integer type and less than or one.
+     * @throws EmitterException if buffer length is integer type and less than or one.
      */
     public function __construct(int $bufferLength = null)
     {
         if ($bufferLength !== null && $bufferLength < 1) {
-            throw new InvalidArgumentException('Buffer length must be greater than zero.');
+            throw EmitterException::forInvalidBufferLength($bufferLength);
         }
 
         $this->bufferLength = $bufferLength;
@@ -42,14 +41,12 @@ final class SapiEmitter implements EmitterInterface
     /**
      * {@inheritDoc}
      *
-     * @throws RuntimeException if headers already sent or output has been emitted previously.
+     * @throws EmitterException if headers already sent or output has been emitted previously.
      */
     public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
         if (headers_sent() || (ob_get_level() > 0 && ob_get_length() > 0)) {
-            throw new RuntimeException(
-                'Unable to emit response. Headers already sent or output has been emitted previously.'
-            );
+            throw EmitterException::forHeadersOrOutputSent();
         }
 
         $this->emitHeaders($response);

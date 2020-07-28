@@ -24,7 +24,8 @@
     "require-dev": {
         "httpsoft/http-response": "^1.0",
         "phpunit/phpunit": "^9.1",
-        "squizlabs/php_codesniffer": "^3.5"
+        "squizlabs/php_codesniffer": "^3.5",
+        "vimeo/psalm": "^3.12"
     },
     "autoload": {
         "psr-4": {
@@ -38,10 +39,12 @@
     },
     "scripts": {
         "test": "phpunit --colors=always",
+        "static": "psalm",
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "check": [
             "@cs-check",
+            "@static",
             "@test"
         ]
     }

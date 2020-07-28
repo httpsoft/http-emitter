@@ -77,7 +77,7 @@ final class SapiEmitter implements EmitterInterface
     private function emitHeaders(ResponseInterface $response): void
     {
         foreach ($response->getHeaders() as $name => $values) {
-            $name = str_replace(' ', '-', ucwords(strtolower(str_replace('-', ' ', $name))));
+            $name = str_replace(' ', '-', ucwords(strtolower(str_replace('-', ' ', (string) $name))));
             $firstReplace = ($name === 'Set-Cookie') ? false : true;
 
             foreach ($values as $value) {

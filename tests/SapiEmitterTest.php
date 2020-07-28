@@ -168,7 +168,7 @@ class SapiEmitterTest extends TestCase
 
     public function testEmitBodyWithNotReadableStream(): void
     {
-        $response = new Response(200, '', fopen('data://,', 'wb'));
+        $response = new Response(200, [], fopen('data://,', 'wb'));
         $response->getBody()->write($contents = 'Contents');
         $response->getBody()->rewind();
         $this->assertFalse($response->getBody()->isReadable());
@@ -250,7 +250,7 @@ class SapiEmitterTest extends TestCase
         string $contents = '',
         string $protocol = '1.1'
     ): ResponseInterface {
-        $response = new Response($statusCode, '', 'php://temp', $headers, $protocol);
+        $response = new Response($statusCode, $headers, 'php://temp', $protocol);
         $response->getBody()->write($contents);
         return $response;
     }

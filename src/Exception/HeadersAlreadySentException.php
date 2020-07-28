@@ -9,7 +9,7 @@ use RuntimeException;
 class HeadersAlreadySentException extends RuntimeException
 {
     /**
-     * @return static
+     * @return self
      */
     public static function create(): self
     {

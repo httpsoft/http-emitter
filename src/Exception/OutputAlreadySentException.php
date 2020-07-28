@@ -9,7 +9,7 @@ use RuntimeException;
 class OutputAlreadySentException extends RuntimeException
 {
     /**
-     * @return static
+     * @return self
      */
     public static function create(): self
     {

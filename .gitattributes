@@ -4,6 +4,7 @@
 /.editorconfig      export-ignore
 /.gitattributes     export-ignore
 /.gitignore         export-ignore
-/.scrutinizer.yml   export-ignoree
+/.scrutinizer.yml   export-ignore
 /phpcs.xml          export-ignore
 /phpunit.xml.dist   export-ignore
+/psalm.xml          export-ignore

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HttpSoft\Runner;
+namespace HttpSoft\Emitter;
 
-use HttpSoft\Tests\Runner\TestAssert\SapiResponseData;
+use HttpSoft\Tests\Emitter\TestAssert\SapiResponseData;
 
 use function array_key_exists;
 use function explode;

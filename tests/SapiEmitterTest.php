@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace HttpSoft\Tests\Runner;
+namespace HttpSoft\Tests\Emitter;
 
+use HttpSoft\Emitter\EmitterInterface;
+use HttpSoft\Emitter\Exception\EmitterException;
+use HttpSoft\Emitter\SapiEmitter;
 use HttpSoft\Response\Response;
-use HttpSoft\Runner\EmitterInterface;
-use HttpSoft\Runner\Exception\EmitterException;
-use HttpSoft\Runner\SapiEmitter;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
 use function array_filter;
 use function fopen;
-use function HttpSoft\Runner\header;
-use function HttpSoft\Runner\header_remove;
-use function HttpSoft\Runner\headers_list;
-use function HttpSoft\Runner\http_response_code;
-use function HttpSoft\Runner\http_response_status_line;
+use function HttpSoft\Emitter\header;
+use function HttpSoft\Emitter\header_remove;
+use function HttpSoft\Emitter\headers_list;
+use function HttpSoft\Emitter\http_response_code;
+use function HttpSoft\Emitter\http_response_status_line;
 use function implode;
 use function is_int;
 use function preg_replace;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HttpSoft\Tests\Runner\TestAssert;
+namespace HttpSoft\Tests\Emitter\TestAssert;
 
 class SapiResponseData
 {

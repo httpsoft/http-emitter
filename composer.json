@@ -1,7 +1,7 @@
 {
-    "name": "httpsoft/http-runner",
-    "description": "Running PSR-7 components and building PSR-15 middleware pipelines",
-    "keywords": ["php", "http", "http-emitter", "http-handler", "http-middleware", "psr-7", "psr-15"],
+    "name": "httpsoft/http-emitter",
+    "description": "Emitting of PSR-7 Response implementation",
+    "keywords": ["php", "http", "http-emitter", "emitter", "psr-7", "http-message"],
     "homepage": "https://httpsoft.org/",
     "type": "library",
     "license": "MIT",
@@ -14,30 +14,26 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/httpsoft/http-runner/issues",
-        "source": "https://github.com/httpsoft/http-runner",
-        "docs": "https://httpsoft.org/docs/runner"
+        "issues": "https://github.com/httpsoft/http-emitter/issues",
+        "source": "https://github.com/httpsoft/http-emitter",
+        "docs": "https://httpsoft.org/docs/emitter"
     },
     "require": {
-        "php": "^7.4",
-        "httpsoft/http-response": "^1.0",
-        "psr/container": "^1.0",
-        "psr/http-message": "^1.0",
-        "psr/http-server-handler": "^1.0",
-        "psr/http-server-middleware": "^1.0"
+        "php": "^7.4"
     },
     "require-dev": {
+        "httpsoft/http-response": "^1.0",
         "phpunit/phpunit": "^9.1",
         "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
         "psr-4": {
-            "HttpSoft\\Runner\\": "src/"
+            "HttpSoft\\Emitter\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "HttpSoft\\Tests\\Runner\\": "tests/"
+            "HttpSoft\\Tests\\Emitter\\": "tests/"
         }
     },
     "scripts": {

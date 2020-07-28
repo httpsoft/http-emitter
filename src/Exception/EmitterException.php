@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HttpSoft\Runner\Exception;
+namespace HttpSoft\Emitter\Exception;
 
 use RuntimeException;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace HttpSoft\Runner;
+namespace HttpSoft\Emitter;
 
-use HttpSoft\Runner\Exception\EmitterException;
+use HttpSoft\Emitter\Exception\EmitterException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 

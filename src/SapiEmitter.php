@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace HttpSoft\Emitter;
 
-use HttpSoft\Emitter\Exception\EmitterException;
+use HttpSoft\Emitter\Exception\HeadersAlreadySentException;
+use HttpSoft\Emitter\Exception\OutputAlreadySentException;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -12,6 +14,7 @@ use function flush;
 use function ob_get_length;
 use function ob_get_level;
 use function preg_match;
+use function sprintf;
 use function strlen;
 use function str_replace;
 use function strtolower;
@@ -27,12 +30,16 @@ final class SapiEmitter implements EmitterInterface
 
     /**
      * @param int|null $bufferLength
-     * @throws EmitterException if buffer length is integer type and less than or one.
+     * @throws InvalidArgumentException if buffer length is integer type and less than or one.
      */
     public function __construct(int $bufferLength = null)
     {
         if ($bufferLength !== null && $bufferLength < 1) {
-            throw EmitterException::forInvalidBufferLength($bufferLength);
+            throw new InvalidArgumentException(sprintf(
+                'Buffer length for `%s` must be greater than zero; received `%d`.',
+                self::class,
+                $bufferLength
+            ));
         }
 
         $this->bufferLength = $bufferLength;
@@ -41,16 +48,17 @@ final class SapiEmitter implements EmitterInterface
     /**
      * {@inheritDoc}
      *
-     * @throws EmitterException if headers already sent or output has been emitted previously.
+     * @throws HeadersAlreadySentException if headers already sent.
+     * @throws OutputAlreadySentException if output has been emitted previously.
      */
     public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
         if (headers_sent()) {
-            throw EmitterException::forHeadersSent();
+            throw HeadersAlreadySentException::create();
         }
 
         if (ob_get_level() > 0 && ob_get_length() > 0) {
-            throw EmitterException::forOutputSent();
+            throw OutputAlreadySentException::create();
         }
 
         $this->emitHeaders($response);

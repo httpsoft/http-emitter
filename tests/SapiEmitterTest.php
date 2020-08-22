@@ -168,11 +168,11 @@ class SapiEmitterTest extends TestCase
 
     public function testEmitBodyWithNotReadableStream(): void
     {
-        $response = new Response(200, [], fopen('data://,', 'wb'));
+        $response = new Response(200, [], fopen('php://output', 'c'));
         $response->getBody()->write($contents = 'Contents');
-        $response->getBody()->rewind();
+        $this->expectOutputString('Contents');
         $this->assertFalse($response->getBody()->isReadable());
-        $this->assertSame('data://,', $response->getBody()->getMetadata('uri'));
+        $this->assertSame('php://output', $response->getBody()->getMetadata('uri'));
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Stream is not readable');
         $this->assertSame($contents, $response->getBody()->getContents());

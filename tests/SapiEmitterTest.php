@@ -6,7 +6,7 @@ namespace HttpSoft\Tests\Emitter;
 
 use HttpSoft\Emitter\EmitterInterface;
 use HttpSoft\Emitter\SapiEmitter;
-use HttpSoft\Response\Response;
+use HttpSoft\Message\Response;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;

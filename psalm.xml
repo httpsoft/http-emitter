@@ -12,10 +12,4 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
-
-    <issueHandlers>
-        <MixedArgument errorLevel="info" />
-        <PossiblyInvalidArgument errorLevel="info" />
-        <PossiblyNullArgument errorLevel="info" />
-    </issueHandlers>
 </psalm>

@@ -106,6 +106,7 @@ final class SapiEmitter implements EmitterInterface
      * Emits the message body.
      *
      * @param ResponseInterface $response
+     * @psalm-suppress MixedArgument
      */
     private function emitBody(ResponseInterface $response): void
     {
@@ -138,6 +139,7 @@ final class SapiEmitter implements EmitterInterface
      * @param StreamInterface $body
      * @param int $first
      * @param int $last
+     * @psalm-suppress PossiblyNullArgument
      */
     private function emitBodyRange(StreamInterface $body, int $first, int $last): void
     {

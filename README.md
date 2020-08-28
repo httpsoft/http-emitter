@@ -4,6 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/httpsoft/http-emitter/v)](https://packagist.org/packages/httpsoft/http-emitter)
 [![Total Downloads](https://poser.pugx.org/httpsoft/http-emitter/downloads)](https://packagist.org/packages/httpsoft/http-emitter)
 [![GitHub Build Status](https://github.com/httpsoft/http-emitter/workflows/build/badge.svg)](https://github.com/httpsoft/http-emitter/actions)
+[![GitHub Static Analysis Status](https://github.com/httpsoft/http-emitter/workflows/static/badge.svg)](https://github.com/httpsoft/http-emitter/actions)
 [![Scrutinizer Code Coverage](https://scrutinizer-ci.com/g/httpsoft/http-emitter/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/httpsoft/http-emitter/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/httpsoft/http-emitter/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/httpsoft/http-emitter/?branch=master)
 

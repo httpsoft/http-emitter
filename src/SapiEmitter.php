@@ -91,6 +91,7 @@ final class SapiEmitter implements EmitterInterface
      * Emits the response status line.
      *
      * @param ResponseInterface $response
+     * @psalm-suppress RedundantCastGivenDocblockType
      */
     private function emitStatusLine(ResponseInterface $response): void
     {

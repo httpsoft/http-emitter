@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace HttpSoft\Tests\Emitter;
 
 use HttpSoft\Emitter\EmitterInterface;
+use HttpSoft\Emitter\Exception\HeadersAlreadySentException;
+use HttpSoft\Emitter\Exception\OutputAlreadySentException;
 use HttpSoft\Emitter\SapiEmitter;
 use HttpSoft\Message\Response;
+use HttpSoft\Tests\Emitter\TestAsset\MockData;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
 
 use function array_filter;
 use function fopen;
 use function HttpSoft\Emitter\header;
-use function HttpSoft\Emitter\header_remove;
 use function HttpSoft\Emitter\headers_list;
 use function HttpSoft\Emitter\http_response_code;
 use function HttpSoft\Emitter\http_response_status_line;
@@ -26,30 +27,16 @@ use function strlen;
 
 class SapiEmitterTest extends TestCase
 {
-    /**
-     * @var SapiEmitter
-     */
-    private SapiEmitter $emitter;
-
-    /**
-     * @var string[]
-     */
-    private array $contentSplitByBytes = [];
-
     public function setUp(): void
     {
-        require 'TestAssert/SapiFunctionMocks.php';
-        header_remove();
-        http_response_code(200);
-        http_response_status_line('');
-        $this->emitter = new SapiEmitter();
-        $this->contentSplitByBytes = [];
+        require 'TestAsset/SapiFunctionMocks.php';
+        MockData::reset();
     }
 
     public function testEmitDefault(): void
     {
         $response = $this->createResponse();
-        $this->emitter->emit($response);
+        (new SapiEmitter())->emit($response);
 
         $this->assertSame(200, http_response_code());
         $this->assertCount(0, headers_list());
@@ -61,7 +48,7 @@ class SapiEmitterTest extends TestCase
     public function testEmitWithSpecifyArguments(): void
     {
         $response = $this->createResponse($code = 404, ['X-Test' => 'test'], $contents = 'Page not found', '2');
-        $this->emitter->emit($response);
+        (new SapiEmitter())->emit($response);
 
         $this->assertSame($code, http_response_code());
         $this->assertCount(1, headers_list());
@@ -79,7 +66,7 @@ class SapiEmitterTest extends TestCase
             ->withAddedHeader('Set-Cookie', 'key-2=value-2')
         ;
 
-        $this->emitter->emit($response);
+        (new SapiEmitter())->emit($response);
 
         $expectedHeaders = [
             'X-Test: test-1',
@@ -169,13 +156,8 @@ class SapiEmitterTest extends TestCase
     public function testEmitBodyWithNotReadableStream(): void
     {
         $response = new Response(200, [], fopen('php://output', 'c'));
-        $response->getBody()->write($contents = 'Contents');
-        $this->expectOutputString('Contents');
-        $this->assertFalse($response->getBody()->isReadable());
         $this->assertSame('php://output', $response->getBody()->getMetadata('uri'));
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream is not readable');
-        $this->assertSame($contents, $response->getBody()->getContents());
+        $this->assertFalse($response->getBody()->isReadable());
 
         $emitter = new SapiEmitter();
         $emitter->emit($response);
@@ -191,10 +173,32 @@ class SapiEmitterTest extends TestCase
         $this->expectOutputString('');
     }
 
+    public function testEmitThrowOutputAlreadySentException(): void
+    {
+        $response = new Response(200, [], fopen('php://output', 'c'));
+        $response->getBody()->write('Contents');
+        $this->expectOutputString('Contents');
+
+        $this->expectException(OutputAlreadySentException::class);
+        $this->expectExceptionMessage('Unable to emit response; output has been emitted previously.');
+
+        (new SapiEmitter())->emit($response);
+    }
+
+    public function testEmitThrowHeadersAlreadySentException(): void
+    {
+        MockData::$isHeadersSent = true;
+
+        $this->expectException(HeadersAlreadySentException::class);
+        $this->expectExceptionMessage('Unable to emit response; headers already sent.');
+
+        (new SapiEmitter())->emit($this->createResponse());
+    }
+
     /**
      * @return array[]
      */
-    public function emitBodyProvider()
+    public function emitBodyProvider(): array
     {
         return [
             ['Contents', ['Contents'], null, null, null],
@@ -225,15 +229,15 @@ class SapiEmitterTest extends TestCase
     {
         $isContentRange = (is_int($first) && is_int($last));
         $outputString = $isContentRange ? implode('', $expected) : $contents;
-        $headers = $isContentRange ? ['Content-Range' => "bytes {$first}-{$last}/*"] : [];
-        $expectedHeaders = $isContentRange ? ["Content-Range: bytes {$first}-{$last}/*"] : [];
+        $headers = $isContentRange ? ['Content-Range' => "bytes $first-$last/*"] : [];
+        $expectedHeaders = $isContentRange ? ["Content-Range: bytes $first-$last/*"] : [];
 
         $response = $this->createResponse(200, $headers, $contents);
         $emitter = $this->createEmitterMock($response, $buffer);
         $emitter->emit($response);
 
         $this->assertSame($expectedHeaders, headers_list());
-        $this->assertSame($expected, array_filter($this->contentSplitByBytes));
+        $this->assertSame($expected, array_filter(MockData::$contentSplitByBytes));
         $this->expectOutputString($outputString);
     }
 
@@ -268,13 +272,13 @@ class SapiEmitterTest extends TestCase
 
             if ($bufferLength === null) {
                 $contents = $body->__toString();
-                $this->contentSplitByBytes[] = $contents;
+                MockData::$contentSplitByBytes[] = $contents;
                 echo $contents;
                 return;
             }
 
             if ($contentRange = $response->getHeaderLine('content-range')) {
-                header("Content-Range: {$contentRange}");
+                header("Content-Range: $contentRange");
                 $first = (int) preg_replace('/^bytes\s(\d)-\d\/\*$/', '$1', $contentRange);
                 $last = (int) preg_replace('/^bytes\s\d-(\d)\/\*$/', '$1', $contentRange);
                 $length = $last - $first + 1;
@@ -286,13 +290,13 @@ class SapiEmitterTest extends TestCase
                 while ($length >= $bufferLength && !$body->eof()) {
                     $contents = $body->read($bufferLength);
                     $length -= strlen($contents);
-                    $this->contentSplitByBytes[] = $contents;
+                    MockData::$contentSplitByBytes[] = $contents;
                     echo $contents;
                 }
 
                 if ($length > 0 && !$body->eof()) {
                     $contents = $body->read($length);
-                    $this->contentSplitByBytes[] = $contents;
+                    MockData::$contentSplitByBytes[] = $contents;
                     echo $contents;
                 }
 
@@ -305,7 +309,7 @@ class SapiEmitterTest extends TestCase
 
             while (!$body->eof()) {
                 $contents = $body->read($bufferLength);
-                $this->contentSplitByBytes[] = $contents;
+                MockData::$contentSplitByBytes[] = $contents;
                 echo $contents;
             }
         });

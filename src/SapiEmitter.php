@@ -78,10 +78,10 @@ final class SapiEmitter implements EmitterInterface
     {
         foreach ($response->getHeaders() as $name => $values) {
             $name = str_replace(' ', '-', ucwords(strtolower(str_replace('-', ' ', (string) $name))));
-            $firstReplace = ($name === 'Set-Cookie') ? false : true;
+            $firstReplace = !($name === 'Set-Cookie');
 
             foreach ($values as $value) {
-                header("{$name}: {$value}", $firstReplace);
+                header("$name: $value", $firstReplace);
                 $firstReplace = false;
             }
         }
@@ -99,8 +99,8 @@ final class SapiEmitter implements EmitterInterface
         $reasonPhrase = trim((string) $response->getReasonPhrase());
         $protocolVersion = trim((string) $response->getProtocolVersion());
 
-        $status = $statusCode . (!$reasonPhrase ? '' : " {$reasonPhrase}");
-        header("HTTP/{$protocolVersion} {$status}", true, $statusCode);
+        $status = $statusCode . (!$reasonPhrase ? '' : " $reasonPhrase");
+        header("HTTP/$protocolVersion $status", true, $statusCode);
     }
 
     /**
@@ -118,9 +118,9 @@ final class SapiEmitter implements EmitterInterface
 
         flush();
         $body = $response->getBody();
-        $range = $this->parseContentRange($response->getHeaderLine('content-range'));
+        $range = $this->parseContentRange($response->getHeaderLine('Content-Range'));
 
-        if (isset($range['unit']) && $range['unit'] === 'bytes') {
+        if ($range !== null && isset($range['unit']) && $range['unit'] === 'bytes') {
             $this->emitBodyRange($body, $range['first'], $range['last']);
             return;
         }
@@ -170,7 +170,11 @@ final class SapiEmitter implements EmitterInterface
      */
     private function parseContentRange(string $header): ?array
     {
-        if (preg_match('/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches)) {
+        if (empty($header)) {
+            return null;
+        }
+
+        if (preg_match('/(?P<unit>\w+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches)) {
             return [
                 'unit' => $matches['unit'],
                 'first' => (int) $matches['first'],

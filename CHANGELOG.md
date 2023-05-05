@@ -1,5 +1,11 @@
 # HTTP Emitter Change Log
 
+## 1.1.0 - 2023.05.05
+
+### Changed
+
+- [#2](https://github.com/httpsoft/http-emitter/pull/2) Allows `psr/http-message` package version 2.
+
 ## 1.0.4 - 2020.12.12
 
 ### Added

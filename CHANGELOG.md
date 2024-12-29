@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- [#3](https://github.com/httpsoft/http-basis/pull/3) Fixes compatibility for PHP 8.4`.
+- [#3](https://github.com/httpsoft/http-emitter/pull/3) Fixes compatibility for PHP 8.4`.
 
 ## 1.1.0 - 2023.05.05
 
